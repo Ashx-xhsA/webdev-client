@@ -16,7 +16,12 @@ export default function AnchorTag() {
         bilibili
       </a>
       <br />
-      <a href="https://github.com/Ashx-xhsA" target="_blank" rel="noreferrer">
+      <a
+        href="https://github.com/Ashx-xhsA"
+        id="wd-your-github"
+        target="_blank"
+        rel="noreferrer"
+      >
         My GitHub (new tab)
       </a>
       <br />
