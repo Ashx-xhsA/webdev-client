@@ -30,9 +30,19 @@ export default function TOC() {
         </a>
       </li>
       <li>
-        <Link href="/book/ch1" id="wd-toc-book-link">
-          Chapter 1
+        <Link href="/" id="wd-kambaz-link">
+          Kambaz
         </Link>
+      </li>
+      <li>
+        <a
+          href="https://github.com/Ashx-xhsA/webdev-client"
+          id="wd-github"
+          target="_blank"
+          rel="noreferrer"
+        >
+          My GitHub
+        </a>
       </li>
     </ul>
   );
