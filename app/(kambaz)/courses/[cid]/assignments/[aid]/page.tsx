@@ -1,6 +1,13 @@
 import Link from 'next/link';
+import * as db from '../../../../database';
 
-export default function AssignmentEditor() {
+export default async function AssignmentEditor({
+  params,
+}: {
+  params: Promise<{ cid: string; aid: string }>;
+}) {
+  const { cid, aid } = await params;
+  const assignment = db.assignments.find((a) => a._id === aid);
   return (
     <div id="wd-assignments-editor" className="ml-15">
       <div className="mb-3 ">
@@ -9,9 +16,12 @@ export default function AssignmentEditor() {
         </label>
         <input
           id="wd-name"
-          defaultValue="A1 - ENV + HTML"
+          defaultValue={assignment?.title ?? ''}
           className="w-full rounded border border-neutral-300 px-3 py-1.5"
         />
+        <div id="wd-assignment-id" className="mt-1 text-sm text-neutral-500">
+          Assignment id: {aid}
+        </div>
       </div>
       <div className="mb-3">
         <label htmlFor="wd-description" className="mb-1 block font-medium">
@@ -19,11 +29,10 @@ export default function AssignmentEditor() {
         </label>
         <textarea
           id="wd-description"
+          defaultValue={assignment?.description ?? ''}
+          rows={8}
           className="w-full rounded border border-neutral-300 px-3 py-1.5"
-        >
-          The assignment is available online Submit a link to the landing page
-          of
-        </textarea>
+        />
       </div>
       <div className="grid grid-cols-[150px_1fr]  items-start gap-x-4 gap-y-3">
         <label htmlFor="wd-points" className="pt-1.5 text-right">
@@ -31,7 +40,7 @@ export default function AssignmentEditor() {
         </label>
         <input
           id="wd-points"
-          defaultValue={100}
+          defaultValue={assignment?.points ?? 100}
           className="w-full rounded border border-neutral-300 px-3 py-1.5"
         />
 
@@ -120,7 +129,7 @@ export default function AssignmentEditor() {
           <input
             type="date"
             id="wd-due-date"
-            defaultValue="2024-05-13"
+            defaultValue={assignment?.due}
             className="mb-3 w-full rounded border border-neutral-300 px-3 py-1.5"
           />
 
@@ -135,7 +144,7 @@ export default function AssignmentEditor() {
               <input
                 type="date"
                 id="wd-available-from"
-                defaultValue="2024-05-06"
+                defaultValue={assignment?.available}
                 className="w-full rounded border border-neutral-300 px-3 py-1.5"
               />
             </div>
@@ -168,14 +177,14 @@ export default function AssignmentEditor() {
       <hr />
       <div className="flex justify-end gap-2 ">
         <Link
-          href="/courses/1234/assignments"
+          href={`/courses/${cid}/assignments`}
           id="wd-cancel"
           className="rounded border bg-gray-200 px-3 py-1.5 text-sm text-black"
         >
           Cancel
         </Link>
         <Link
-          href="/courses/1234/assignments"
+          href={`/courses/${cid}/assignments`}
           id="wd-save"
           className="rounded border bg-red-600 px-3 py-1.5 text-sm text-white"
         >

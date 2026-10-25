@@ -17,6 +17,11 @@ const LINKS = [
   { segment: 'quizzes', id: 'wd-course-quizzes-link', label: 'Quizzes' },
   { segment: 'grades', id: 'wd-course-grades-link', label: 'Grades' },
   { segment: 'people/table', id: 'wd-course-people-link', label: 'People' },
+  {
+    segment: 'announcements',
+    id: 'wd-course-announcements-link',
+    label: 'Announcements',
+  },
 ] as const;
 
 export default function CourseNavigation({ cid }: { cid: string }) {

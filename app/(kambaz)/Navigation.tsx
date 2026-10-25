@@ -13,6 +13,7 @@ const LINKS = [
   { label: 'Calendar', path: '/calendar', icon: IoCalendarOutline },
   { label: 'Inbox', path: '/inbox', icon: FaInbox },
   { label: 'Labs', path: '/labs', icon: LiaCogSolid },
+  { label: 'History', path: '/history', icon: IoCalendarOutline },
 ] as const;
 
 export default function KambazNavigation() {
