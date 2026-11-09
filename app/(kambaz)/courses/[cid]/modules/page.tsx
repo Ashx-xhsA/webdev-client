@@ -5,42 +5,22 @@ import { useParams } from "next/navigation";
 import Lesson from "./Lesson";
 import Module from "./Module";
 import ModulesControls from "./ModulesControls";
-import * as db from "../../../database";
-
-type ModuleItem = (typeof db.modules)[number] & { editing?: boolean };
+import { useModulesStore } from "../../../store/modulesStore";
 
 export default function Modules() {
   const { cid } = useParams();
   const courseId = typeof cid === "string" ? cid : "";
-  const [modules, setModules] = useState<ModuleItem[]>(db.modules);
+  const modules = useModulesStore((state) => state.modules);
+  const addModule = useModulesStore((state) => state.addModule);
+  const deleteModule = useModulesStore((state) => state.deleteModule);
+  const updateModule = useModulesStore((state) => state.updateModule);
+  const editModule = useModulesStore((state) => state.editModule);
   const [moduleName, setModuleName] = useState("");
 
-  const addModule = () => {
-    setModules([
-      ...modules,
-      {
-        _id: crypto.randomUUID(),
-        name: moduleName,
-        description: "",
-        course: courseId,
-        lessons: [],
-      },
-    ]);
+  const handleAddModule = () => {
+    if (moduleName.trim() === "") return;
+    addModule({ name: moduleName, course: courseId });
     setModuleName("");
-  };
-
-  const deleteModule = (moduleId: string) => {
-    setModules(modules.filter((m) => m._id !== moduleId));
-  };
-
-  const editModule = (moduleId: string) => {
-    setModules(
-      modules.map((m) => (m._id === moduleId ? { ...m, editing: true } : m))
-    );
-  };
-
-  const updateModule = (module: ModuleItem) => {
-    setModules(modules.map((m) => (m._id === module._id ? module : m)));
   };
 
   return (
@@ -48,7 +28,7 @@ export default function Modules() {
       <ModulesControls
         moduleName={moduleName}
         setModuleName={setModuleName}
-        addModule={addModule}
+        addModule={handleAddModule}
       />
       <ul id="wd-modules" className="m-0 list-none p-0">
         {modules

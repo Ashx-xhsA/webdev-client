@@ -1,16 +1,18 @@
-import { FaUserCircle } from 'react-icons/fa';
-import * as db from '../../../../database';
+"use client";
 
-export default async function PeopleTable({
-  params,
-}: {
-  params: Promise<{ cid: string }>;
-}) {
-  const { cid } = await params;
-  const { users, enrollments } = db;
-  const enrolled = users.filter((usr) =>
+import { useParams } from "next/navigation";
+import { FaUserCircle } from "react-icons/fa";
+import * as db from "../../../../database";
+import { useEnrollmentsStore } from "../../../../store/enrollmentsStore";
+
+export default function PeopleTable() {
+  const { cid } = useParams();
+  const courseId = typeof cid === "string" ? cid : "";
+  const enrollments = useEnrollmentsStore((state) => state.enrollments);
+  const enrolled = db.users.filter((usr) =>
     enrollments.some(
-      (enrollment) => enrollment.user === usr._id && enrollment.course === cid,
+      (enrollment) =>
+        enrollment.user === usr._id && enrollment.course === courseId,
     ),
   );
   return (
@@ -31,7 +33,7 @@ export default async function PeopleTable({
             <tr key={user._id} className="odd:bg-neutral-50">
               <td className="wd-full-name p-2 text-nowrap">
                 <FaUserCircle className="me-2 inline text-4xl text-neutral-500" />
-                <span className="wd-first-name">{user.firstName}</span>{' '}
+                <span className="wd-first-name">{user.firstName}</span>{" "}
                 <span className="wd-last-name">{user.lastName}</span>
               </td>
               <td className="wd-login-id p-2">{user.loginId}</td>
