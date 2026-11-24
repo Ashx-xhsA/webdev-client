@@ -52,6 +52,26 @@ export default function TOC() {
           My GitHub
         </a>
       </li>
+      <li>
+        <a
+          href="https://github.com/Ashx-xhsA/webdev-server"
+          id="wd-github-server"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Node Server GitHub
+        </a>
+      </li>
+      <li>
+        <a
+          href="https://webdev-server-6cb0.onrender.com"
+          id="wd-server-root"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Node Server (Render)
+        </a>
+      </li>
     </ul>
   );
 }
