@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import * as client from "../../../client";
 import {
   emptyAssignment,
   useAssignmentsStore,
@@ -16,6 +17,7 @@ export default function AssignmentEditor() {
   const existing = useAssignmentsStore((state) =>
     state.assignments.find((a) => a._id === assignmentId),
   );
+  const setAssignments = useAssignmentsStore((state) => state.setAssignments);
   const addAssignment = useAssignmentsStore((state) => state.addAssignment);
   const updateAssignment = useAssignmentsStore(
     (state) => state.updateAssignment,
@@ -26,11 +28,41 @@ export default function AssignmentEditor() {
   );
   const listUrl = `/courses/${courseId}/assignments`;
 
-  const save = () => {
+  // After a refresh the store is empty, so fetch this course's assignments.
+  useEffect(() => {
+    if (isNew || existing) return;
+    const load = async () => {
+      try {
+        setAssignments(await client.findAssignmentsForCourse(courseId));
+      } catch {
+        /* server may be down */
+      }
+    };
+    load();
+  }, [isNew, existing, courseId, setAssignments]);
+
+  // Copy the fetched assignment into the form once it arrives.
+  const [loadedId, setLoadedId] = useState(existing?._id);
+  if (existing && loadedId !== existing._id) {
+    setLoadedId(existing._id);
+    setAssignment(existing);
+  }
+
+  const save = async () => {
     if (isNew) {
-      addAssignment({ ...assignment, course: courseId });
+      const created = await client.createAssignmentForCourse(courseId, {
+        ...assignment,
+        course: courseId,
+      });
+      addAssignment(created);
     } else {
-      updateAssignment({ ...assignment, _id: assignmentId, course: courseId });
+      const updated: Assignment = {
+        ...assignment,
+        _id: assignmentId,
+        course: courseId,
+      };
+      const saved = await client.updateAssignment(updated);
+      updateAssignment(saved);
     }
     router.push(listUrl);
   };

@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { FaAlignJustify } from "react-icons/fa6";
 import CourseNavigation from "./Navigation";
 import Breadcrumb from "./Breadcrumb";
+import * as client from "../client";
 import { useCoursesStore } from "../../store/coursesStore";
 import { isEnrolled, useEnrollmentsStore } from "../../store/enrollmentsStore";
 import { useAccountContext } from "../../account/AccountContext";
@@ -17,18 +18,50 @@ export default function CoursesLayout({
   const { cid } = useParams();
   const courseId = typeof cid === "string" ? cid : "";
   const courses = useCoursesStore((state) => state.courses);
+  const setCourses = useCoursesStore((state) => state.setCourses);
   const course = courses.find((c) => c._id === courseId);
   const [showCourseNav, setShowCourseNav] = useState(true);
   const { currentUser } = useAccountContext();
   const enrollments = useEnrollmentsStore((state) => state.enrollments);
+  const setEnrollments = useEnrollmentsStore((state) => state.setEnrollments);
+  const [enrollmentsLoaded, setEnrollmentsLoaded] = useState(false);
   const router = useRouter();
   const allowed =
-    !currentUser || isEnrolled(enrollments, currentUser._id, courseId);
+    !currentUser ||
+    !enrollmentsLoaded ||
+    isEnrolled(enrollments, currentUser._id, courseId);
+
+  // After a refresh the stores are empty, so reload them from Express.
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setEnrollments(await client.findAllEnrollments());
+      } catch {
+        setEnrollments([]);
+      } finally {
+        setEnrollmentsLoaded(true);
+      }
+    };
+    load();
+  }, [courseId, setEnrollments]);
+
+  useEffect(() => {
+    if (course) return;
+    const load = async () => {
+      try {
+        setCourses(await client.fetchAllCourses());
+      } catch {
+        /* server may be down */
+      }
+    };
+    load();
+  }, [course, setCourses]);
 
   useEffect(() => {
     if (!allowed) router.replace("/dashboard");
   }, [allowed, router]);
 
+  if (!enrollmentsLoaded) return null;
   if (!allowed) return null;
 
   return (

@@ -1,21 +1,37 @@
 "use client";
 
+import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { FaPlus, FaSearch } from "react-icons/fa";
 import AssignmentItem from "./AssignmentItem";
+import * as client from "../../client";
 import { useAssignmentsStore } from "../../../store/assignmentsStore";
 
 export default function Assignments() {
   const { cid } = useParams();
   const courseId = typeof cid === "string" ? cid : "";
   const router = useRouter();
-  const allAssignments = useAssignmentsStore((state) => state.assignments);
+  const assignments = useAssignmentsStore((state) => state.assignments);
+  const setAssignments = useAssignmentsStore((state) => state.setAssignments);
   const deleteAssignment = useAssignmentsStore(
     (state) => state.deleteAssignment,
   );
-  const assignments = allAssignments.filter(
-    (assignment) => assignment.course === courseId,
-  );
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setAssignments(await client.findAssignmentsForCourse(courseId));
+      } catch {
+        setAssignments([]);
+      }
+    };
+    load();
+  }, [courseId, setAssignments]);
+
+  const onDeleteAssignment = async (assignmentId: string) => {
+    await client.deleteAssignment(assignmentId);
+    deleteAssignment(assignmentId);
+  };
   return (
     <div id="wd-assignments">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
@@ -65,7 +81,7 @@ export default function Assignments() {
             aid={assignment._id}
             title={assignment.title}
             details={`Multiple Modules | Not available until ${assignment.available} | Due ${assignment.due} | ${assignment.points} pts`}
-            onDelete={deleteAssignment}
+            onDelete={onDeleteAssignment}
           />
         ))}
       </ul>
